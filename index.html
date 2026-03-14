@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI人格测试 - 发现你的真实性格</title>
+    <meta name="description" content="免费MBTI人格测试，93道题深入分析，发现你的性格类型。包含16种MBTI人格类型详细解读。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="showPage('home'); return false;">
+                <div class="logo-icon">🧠</div>
+                <div class="logo-text">
+                    <span>MBTI</span>测试
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Home Page -->
+        <div id="home-page" class="page home-page">
+            <div class="bento-grid">
+                <!-- Hero Card -->
+                <div class="bento-card large hero-card animate-slideUp">
+                    <h1 class="hero-title">发现你的<br>人格类型</h1>
+                    <p class="hero-subtitle">93道科学题目，深入分析你的性格特点，了解真实的自己</p>
+                    <button class="start-btn" onclick="startTest()">
+                        开始测试
+                        <span class="arrow">→</span>
+                    </button>
+                </div>
+
+                <!-- Feature: Quick Test -->
+                <div class="bento-card purple animate-slideUp stagger-1">
+                    <div class="card-icon">⚡</div>
+                    <h3 class="card-title">快速测试</h3>
+                    <p class="card-description">约5分钟完成，科学的MBTI测评</p>
+                    <span class="card-stat">5'</span>
+                </div>
+
+                <!-- Feature: Detailed Analysis -->
+                <div class="bento-card cyan animate-slideUp stagger-2">
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">详细分析</h3>
+                    <p class="card-description">16种人格类型完整解读</p>
+                    <span class="card-stat">16</span>
+                </div>
+
+                <!-- Feature: Free -->
+                <div class="bento-card green animate-slideUp stagger-3">
+                    <div class="card-icon">🎁</div>
+                    <h3 class="card-title">完全免费</h3>
+                    <p class="card-description">无需注册，立即查看结果</p>
+                    <span class="card-stat">FREE</span>
+                </div>
+
+                <!-- MBTI Types Preview -->
+                <div class="bento-card wide orange animate-slideUp stagger-4">
+                    <div class="card-icon">🔮</div>
+                    <h3 class="card-title">16种人格类型</h3>
+                    <p class="card-description">每种类型独特的性格特点与发展建议</p>
+                    <div class="types-card">
+                        <span class="type-badge analysts" onclick="showTypeResult('INTJ')">INTJ</span>
+                        <span class="type-badge analysts" onclick="showTypeResult('INTP')">INTP</span>
+                        <span class="type-badge analysts" onclick="showTypeResult('ENTJ')">ENTJ</span>
+                        <span class="type-badge analysts" onclick="showTypeResult('ENTP')">ENTP</span>
+                        <span class="type-badge diplomats" onclick="showTypeResult('INFJ')">INFJ</span>
+                        <span class="type-badge diplomats" onclick="showTypeResult('INFP')">INFP</span>
+                        <span class="type-badge diplomats" onclick="showTypeResult('ENFJ')">ENFJ</span>
+                        <span class="type-badge diplomats" onclick="showTypeResult('ENFP')">ENFP</span>
+                        <span class="type-badge sentinels" onclick="showTypeResult('ISTJ')">ISTJ</span>
+                        <span class="type-badge sentinels" onclick="showTypeResult('ISFJ')">ISFJ</span>
+                        <span class="type-badge sentinels" onclick="showTypeResult('ESTJ')">ESTJ</span>
+                        <span class="type-badge sentinels" onclick="showTypeResult('ESFJ')">ESFJ</span>
+                        <span class="type-badge explorers" onclick="showTypeResult('ISTP')">ISTP</span>
+                        <span class="type-badge explorers" onclick="showTypeResult('ISFP')">ISFP</span>
+                        <span class="type-badge explorers" onclick="showTypeResult('ESTP')">ESTP</span>
+                        <span class="type-badge explorers" onclick="showTypeResult('ESFP')">ESFP</span>
+                    </div>
+                </div>
+
+                <!-- About MBTI -->
+                <div class="bento-card blue animate-slideUp stagger-5">
+                    <div class="card-icon">💡</div>
+                    <h3 class="card-title">关于MBTI</h3>
+                    <p class="card-description">基于荣格心理学的科学人格分类系统</p>
+                </div>
+
+                <!-- Dimensions -->
+                <div class="bento-card pink animate-slideUp stagger-6">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">四个维度</h3>
+                    <p class="card-description">E/I · S/N · T/F · J/P</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Page -->
+        <div id="quiz-page" class="page quiz-page">
+            <div class="quiz-header animate-slideUp">
+                <div class="quiz-header-row">
+                    <button class="quit-btn" onclick="quitQuiz()">← 退出</button>
+                    <button class="prev-btn" id="prev-question-btn" onclick="prevQuestion()">← 上一题</button>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-text">问题 <span id="current-num">1</span> / <span id="total-num">93</span></span>
+                        <span class="progress-percent" id="progress-percent">1%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 1%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-content animate-slideUp stagger-1">
+                <div class="dimension-tags">
+                    <span class="dim-tag" id="tag-ei">外向/内向</span>
+                    <span class="dim-tag" id="tag-sn">感觉/直觉</span>
+                    <span class="dim-tag" id="tag-tf">思考/情感</span>
+                    <span class="dim-tag" id="tag-jp">判断/知觉</span>
+                </div>
+
+                <div class="question-number" id="question-number">问题 1</div>
+                <div class="question-text" id="question-text">
+                    在社交聚会中，你通常：
+                </div>
+
+                <div class="options-list">
+                    <div class="option-item" id="option-a" onclick="selectOption('A')">
+                        <div class="option-text" id="option-a-text">与许多人交流，包括陌生人</div>
+                    </div>
+                    <div class="option-item" id="option-b" onclick="selectOption('B')">
+                        <div class="option-text" id="option-b-text">只与熟悉的几个人深入交流</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <div id="results-page" class="page results-page">
+            <div class="results-header animate-slideUp">
+                <h1 class="results-title">测试完成！</h1>
+                <p class="results-subtitle">根据你的回答，你的人格类型是</p>
+            </div>
+
+            <div class="result-card animate-slideUp stagger-1" id="result-card">
+                <div class="result-type-container">
+                    <div class="result-type" id="result-type">INTJ</div>
+                    <div class="result-info">
+                        <div class="result-name" id="result-name">建筑师</div>
+                        <div class="result-english" id="result-english">Architect</div>
+                        <div class="result-group" id="result-group">
+                            <span>分析家</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-description" id="result-description">
+                    富有想象力和战略性的思考者，拥有强大的内在动力去实现自己的目标。
+                </div>
+            </div>
+
+            <div class="analysis-section animate-slideUp stagger-2">
+                <h2 class="analysis-title">
+                    <span class="icon">✨</span>
+                    性格优势
+                </h2>
+                <div class="analysis-grid">
+                    <div class="analysis-card" style="--analysis-color: #22C55E">
+                        <div class="analysis-card-title">你的优势</div>
+                        <div class="analysis-list" id="strengths-list"></div>
+                    </div>
+                    <div class="analysis-card" style="--analysis-color: #F59E0B">
+                        <div class="analysis-card-title">成长空间</div>
+                        <div class="analysis-list" id="weaknesses-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-section animate-slideUp stagger-3">
+                <h2 class="analysis-title">
+                    <span class="icon">💜</span>
+                    人际关系
+                </h2>
+                <div class="analysis-card" style="--analysis-color: #A855F7">
+                    <div class="analysis-text" id="result-relationships"></div>
+                </div>
+            </div>
+
+            <div class="analysis-section animate-slideUp stagger-4">
+                <h2 class="analysis-title">
+                    <span class="icon">💼</span>
+                    职业发展
+                </h2>
+                <div class="analysis-card career-card" style="--analysis-color: #3B82F6">
+                    <div class="analysis-text" id="result-career"></div>
+                </div>
+            </div>
+
+            <div class="result-actions animate-slideUp stagger-5">
+                <button class="action-btn primary" onclick="showPage('home')">
+                    🏠 回到首页
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -54,12 +54,12 @@
                     <span class="card-stat">16</span>
                 </div>
 
-                <!-- Feature: Free -->
+                <!-- Feature: Scientific -->
                 <div class="bento-card green animate-slideUp stagger-3">
-                    <div class="card-icon">🎁</div>
-                    <h3 class="card-title">完全免费</h3>
-                    <p class="card-description">无需注册，立即查看结果</p>
-                    <span class="card-stat">FREE</span>
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">科学测评</h3>
+                    <p class="card-description">基于心理学理论的严谨人格分析</p>
+                    <span class="card-stat">93题</span>
                 </div>
 
                 <!-- MBTI Types Preview -->
@@ -96,7 +96,7 @@
 
                 <!-- Dimensions -->
                 <div class="bento-card pink animate-slideUp stagger-6">
-                    <div class="card-icon">🎯</div>
+                    <div class="card-icon">📐</div>
                     <h3 class="card-title">四个维度</h3>
                     <p class="card-description">E/I · S/N · T/F · J/P</p>
                 </div>
@@ -134,12 +134,34 @@
                     在社交聚会中，你通常：
                 </div>
 
-                <div class="options-list">
-                    <div class="option-item" id="option-a" onclick="selectOption('A')">
-                        <div class="option-text" id="option-a-text">与许多人交流，包括陌生人</div>
+                <!-- Phrase Labels -->
+                <div class="phrase-labels">
+                    <div class="phrase-label phrase-left">
+                        <span class="phrase-letter">A</span>
+                        <span class="phrase-text" id="phrase-left"></span>
                     </div>
-                    <div class="option-item" id="option-b" onclick="selectOption('B')">
-                        <div class="option-text" id="option-b-text">只与熟悉的几个人深入交流</div>
+                    <div class="phrase-label phrase-right">
+                        <span class="phrase-letter">B</span>
+                        <span class="phrase-text" id="phrase-right"></span>
+                    </div>
+                </div>
+
+                <!-- Likert Scale Options (5 buttons) -->
+                <div class="options-list likert-options">
+                    <div class="option-item" id="option-1" onclick="selectOption(1)">
+                        <div class="option-text">非常像A</div>
+                    </div>
+                    <div class="option-item" id="option-2" onclick="selectOption(2)">
+                        <div class="option-text">比较像A</div>
+                    </div>
+                    <div class="option-item" id="option-3" onclick="selectOption(3)">
+                        <div class="option-text">居中</div>
+                    </div>
+                    <div class="option-item" id="option-4" onclick="selectOption(4)">
+                        <div class="option-text">比较像B</div>
+                    </div>
+                    <div class="option-item" id="option-5" onclick="selectOption(5)">
+                        <div class="option-text">非常像B</div>
                     </div>
                 </div>
             </div>

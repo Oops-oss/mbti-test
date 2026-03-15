@@ -1,10 +1,28 @@
-// MBTI Test Application Logic
+// MBTI Test Application Logic - Likert Scale Version
+
+// 5-level Likert score mapping
+const SCORE_MAP = {
+    1: 2,   // 非常像A → +2
+    2: 1,   // 比较像A → +1
+    3: 0,   // 居中 → 0
+    4: -1,  // 比较像B → -1
+    5: -2   // 非常像B → -2
+};
+
+// Option labels for display
+const OPTION_LABELS = {
+    1: "非常像A",
+    2: "比较像A",
+    3: "居中",
+    4: "比较像B",
+    5: "非常像B"
+};
 
 // App State
 const AppState = {
     currentPage: 'home',
     currentQuestionIndex: 0,
-    answers: [],
+    answers: [],  // Stores { questionId, dimension, optionIndex, leftLetter, rightLetter, score }
     scores: {
         E: 0, I: 0,
         S: 0, N: 0,
@@ -50,8 +68,10 @@ function prevQuestion() {
         // Remove last answer from answers array
         var lastAnswer = AppState.answers.pop();
         if (lastAnswer) {
-            // Decrement the score
-            AppState.scores[lastAnswer.answer]--;
+            // Reverse the scoring: subtract what was added
+            var score = lastAnswer.score;
+            AppState.scores[lastAnswer.leftLetter] -= score;
+            AppState.scores[lastAnswer.rightLetter] -= (-score);
         }
         
         // Go back to previous question
@@ -128,21 +148,30 @@ function loadQuestion(index) {
     // Update question
     document.getElementById('question-number').textContent = '问题 ' + (index + 1);
     document.getElementById('question-text').textContent = question.question;
-    document.getElementById('option-a-text').textContent = question.optionA.text;
-    document.getElementById('option-b-text').textContent = question.optionB.text;
+    
+    // Update phrase labels (A/B)
+    document.getElementById('phrase-left').textContent = question.phraseLeft;
+    document.getElementById('phrase-right').textContent = question.phraseRight;
     
     // Update dimension tags
     updateDimensionTags(question.dimension);
     
-    // Reset option states
-    document.getElementById('option-a').classList.remove('selected');
-    document.getElementById('option-b').classList.remove('selected');
+    // Reset all option states
+    for (var i = 1; i <= 5; i++) {
+        var optionEl = document.getElementById('option-' + i);
+        if (optionEl) {
+            optionEl.classList.remove('selected');
+        }
+    }
     
     // Check if there's a previous answer for this question to restore state
     if (AppState.answers[index]) {
-        var savedAnswer = AppState.answers[index].answer;
-        if (savedAnswer === 'A' || savedAnswer === 'B') {
-            document.getElementById('option-' + savedAnswer.toLowerCase()).classList.add('selected');
+        var savedOptionIndex = AppState.answers[index].optionIndex;
+        if (savedOptionIndex >= 1 && savedOptionIndex <= 5) {
+            var savedEl = document.getElementById('option-' + savedOptionIndex);
+            if (savedEl) {
+                savedEl.classList.add('selected');
+            }
         }
     }
     
@@ -185,25 +214,61 @@ function animateQuestion() {
     content.style.animation = 'slideUp 0.3s ease forwards';
 }
 
-// Select Option
-function selectOption(option) {
+// Select Option (Likert scale: 1-5)
+function selectOption(optionIndex) {
     var question = MBTI_DATA.questions[AppState.currentQuestionIndex];
     if (!question) return;
     
-    // Record answer
-    var answer = option === 'A' ? question.optionA.score : question.optionB.score;
+    // Check if user already answered this question (replace previous answer)
+    var existingAnswerIndex = -1;
+    for (var i = 0; i < AppState.answers.length; i++) {
+        if (AppState.answers[i].questionId === question.id) {
+            existingAnswerIndex = i;
+            break;
+        }
+    }
+    
+    // If already answered, remove the old answer and score first
+    if (existingAnswerIndex !== -1) {
+        var oldAnswer = AppState.answers[existingAnswerIndex];
+        // Reverse the old scoring
+        AppState.scores[oldAnswer.leftLetter] -= oldAnswer.score;
+        AppState.scores[oldAnswer.rightLetter] -= (-oldAnswer.score);
+        // Remove old answer
+        AppState.answers.splice(existingAnswerIndex, 1);
+    }
+    
+    // Get score from mapping
+    var score = SCORE_MAP[optionIndex];
+    
+    // Record new answer
     AppState.answers.push({
         questionId: question.id,
         dimension: question.dimension,
-        answer: answer
+        optionIndex: optionIndex,
+        leftLetter: question.leftLetter,
+        rightLetter: question.rightLetter,
+        score: score
     });
     
-    // Update scores
-    AppState.scores[answer]++;
+    // Update scores using leftLetter/rightLetter mapping
+    // leftLetter gets +score, rightLetter gets -score (which adds to the opposite direction)
+    AppState.scores[question.leftLetter] += score;
+    AppState.scores[question.rightLetter] += (-score);
     
     // Visual feedback
-    var selectedEl = document.getElementById('option-' + option.toLowerCase());
-    selectedEl.classList.add('selected');
+    // Remove selected from all options first
+    for (var i = 1; i <= 5; i++) {
+        var optEl = document.getElementById('option-' + i);
+        if (optEl) {
+            optEl.classList.remove('selected');
+        }
+    }
+    // Add selected to clicked option
+    var selectedEl = document.getElementById('option-' + optionIndex);
+    if (selectedEl) {
+        selectedEl.classList.add('selected');
+    }
     
     // Move to next question or show results
     setTimeout(function() {
@@ -221,14 +286,23 @@ function selectOption(option) {
 function calculateResult() {
     var scores = AppState.scores;
     
-    // Determine each dimension
-    var dimensionEI = scores.E >= scores.I ? 'E' : 'I';
-    var dimensionSN = scores.S >= scores.N ? 'S' : 'N';
-    var dimensionTF = scores.T >= scores.F ? 'T' : 'F';
-    var dimensionJP = scores.J >= scores.P ? 'J' : 'P';
+    // Count questions per dimension
+    var dimensionCounts = { EI: 0, SN: 0, TF: 0, JP: 0 };
+    MBTI_DATA.questions.forEach(function(q) {
+        dimensionCounts[q.dimension]++;
+    });
+    
+    // Determine each dimension based on score comparison
+    // Compare scores.E vs scores.I, scores.S vs scores.N, etc.
+    // Positive score means倾向leftLetter, negative means倾向rightLetter
+    
+    var letter1 = scores.E >= scores.I ? 'E' : 'I';
+    var letter2 = scores.S >= scores.N ? 'S' : 'N';
+    var letter3 = scores.T >= scores.F ? 'T' : 'F';
+    var letter4 = scores.J >= scores.P ? 'J' : 'P';
     
     // Get result type
-    var resultType = dimensionEI + dimensionSN + dimensionTF + dimensionJP;
+    var resultType = letter1 + letter2 + letter3 + letter4;
     var resultData = MBTI_DATA.types[resultType];
     
     if (resultData) {
@@ -244,20 +318,26 @@ function calculateResult() {
         }
         
         // Calculate percentages for display
-        var totalE = scores.E + scores.I;
-        var totalS = scores.S + scores.N;
-        var totalT = scores.T + scores.F;
-        var totalJ = scores.J + scores.P;
+        // Use absolute difference for percentage calculation
+        var dimEI = scores.E - scores.I;
+        var dimSN = scores.S - scores.N;
+        var dimTF = scores.T - scores.F;
+        var dimJP = scores.J - scores.P;
+        
+        var maxEI = dimensionCounts.EI * 2;
+        var maxSN = dimensionCounts.SN * 2;
+        var maxTF = dimensionCounts.TF * 2;
+        var maxJP = dimensionCounts.JP * 2;
         
         AppState.result.percentages = {
-            E: Math.round((scores.E / totalE) * 100),
-            I: Math.round((scores.I / totalE) * 100),
-            S: Math.round((scores.S / totalS) * 100),
-            N: Math.round((scores.N / totalS) * 100),
-            T: Math.round((scores.T / totalT) * 100),
-            F: Math.round((scores.F / totalT) * 100),
-            J: Math.round((scores.J / totalJ) * 100),
-            P: Math.round((scores.P / totalJ) * 100)
+            E: Math.round(50 + (dimEI / maxEI) * 50),
+            I: Math.round(50 + (-dimEI / maxEI) * 50),
+            S: Math.round(50 + (dimSN / maxSN) * 50),
+            N: Math.round(50 + (-dimSN / maxSN) * 50),
+            T: Math.round(50 + (dimTF / maxTF) * 50),
+            F: Math.round(50 + (-dimTF / maxTF) * 50),
+            J: Math.round(50 + (dimJP / maxJP) * 50),
+            P: Math.round(50 + (-dimJP / maxJP) * 50)
         };
         
         displayResult();
@@ -384,10 +464,16 @@ function displayDirectType() {
 document.addEventListener('keydown', function(e) {
     if (AppState.currentPage !== 'quiz') return;
     
-    if (e.key === '1' || e.key === 'a' || e.key === 'A') {
-        selectOption('A');
-    } else if (e.key === '2' || e.key === 'b' || e.key === 'B') {
-        selectOption('B');
+    if (e.key === '1') {
+        selectOption(1);
+    } else if (e.key === '2') {
+        selectOption(2);
+    } else if (e.key === '3') {
+        selectOption(3);
+    } else if (e.key === '4') {
+        selectOption(4);
+    } else if (e.key === '5') {
+        selectOption(5);
     }
 });
 

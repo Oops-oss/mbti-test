@@ -379,6 +379,26 @@ function displayResult() {
     // Update career
     document.getElementById('result-career').textContent = result.career;
     
+    // Update communication style
+    if (result.communication) {
+        document.getElementById('result-communication').textContent = result.communication;
+    }
+    
+    // Update emotional pattern
+    if (result.emotional) {
+        document.getElementById('result-emotional').textContent = result.emotional;
+    }
+    
+    // Update work style
+    if (result.workstyle) {
+        document.getElementById('result-workstyle').textContent = result.workstyle;
+    }
+    
+    // Update growth
+    if (result.growth) {
+        document.getElementById('result-growth').textContent = result.growth;
+    }
+    
     // Add result color to gradient background
     resultCard.style.background = 'linear-gradient(135deg, var(--bg-card) 0%, ' + result.color + '15 100%)';
     
@@ -452,6 +472,26 @@ function displayDirectType() {
     
     // Update career
     document.getElementById('result-career').textContent = result.career;
+    
+    // Update communication style
+    if (result.communication) {
+        document.getElementById('result-communication').textContent = result.communication;
+    }
+    
+    // Update emotional pattern
+    if (result.emotional) {
+        document.getElementById('result-emotional').textContent = result.emotional;
+    }
+    
+    // Update work style
+    if (result.workstyle) {
+        document.getElementById('result-workstyle').textContent = result.workstyle;
+    }
+    
+    // Update growth
+    if (result.growth) {
+        document.getElementById('result-growth').textContent = result.growth;
+    }
     
     // Add result color to gradient background
     resultCard.style.background = 'linear-gradient(135deg, var(--bg-card) 0%, ' + result.color + '15 100%)';
